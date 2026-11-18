@@ -1,0 +1,11 @@
+{
+  "$schema":"node_modules/wrangler/config-schema.json",
+  "name":"bridgehaul-task-desk",
+  "account_id":"2b3a9823b3c792bb833f10eb41a48d0e",
+  "main":"worker/cloudflare.ts",
+  "compatibility_date":"2026-05-15",
+  "compatibility_flags":["nodejs_compat"],
+  "workers_dev":true,
+  "d1_databases":[{"binding":"DB","database_name":"bridgehaul-task-desk","database_id":"0b00ea61-d39f-4739-906b-4f4cbc1651a2"}],
+  "vars":{"ACCESS_TEAM_DOMAIN":"jana-demers.cloudflareaccess.com","ADMIN_EMAILS":"jana.demers@bridgehaul.com","ACCESS_AUD":"a5e70e40becac6d1732074ec237eab91a0c724317fbb296dc48ad74338bd8c10"}
+}

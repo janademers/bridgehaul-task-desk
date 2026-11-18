@@ -1,0 +1,16 @@
+import ts from 'typescript';import fs from 'node:fs';import assert from 'node:assert/strict';
+const source=ts.transpileModule(fs.readFileSync('app/lib/duty-policy.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText;
+const {normalizeDuty,inactiveAssignment}=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
+assert.equal(normalizeDuty({owner:'Automation',active:true}).active,false);
+assert.equal(normalizeDuty({owner:'Automation',active:true}).workType,'Automated');
+assert.equal(normalizeDuty({owner:'Courtney Trimble',notes:"Part Automated, But confirm Carrier CC'ed Comdata Team",active:false}).workType,'Partially automated');
+assert.equal(normalizeDuty({owner:'Courtney Trimble',workType:'Automated',active:true}).active,false);
+assert.equal(normalizeDuty({owner:'Courtney Trimble',workType:'Partially automated',active:true}).active,true);
+assert.equal(normalizeDuty({owner:'Automation',workType:'Manual',active:true}).active,true);
+const staff=[{name:'John Carl Granados',active:0},{name:'Courtney Butigan',active:1}];
+assert.equal(inactiveAssignment('John Carl',staff),true);
+assert.equal(inactiveAssignment(' john carl ',staff),true);
+assert.equal(inactiveAssignment('JOHN CARL GRANADOS',staff),true);
+assert.equal(inactiveAssignment('Courtney Butigan',staff),false);
+assert.equal(inactiveAssignment('Unassigned',staff),false);
+console.log('11 duty classification and inactive-assignment checks passed');

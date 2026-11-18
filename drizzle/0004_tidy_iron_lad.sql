@@ -1,0 +1,1 @@
+ALTER TABLE `reminder_queue` ADD `provider_reference` text DEFAULT '' NOT NULL;

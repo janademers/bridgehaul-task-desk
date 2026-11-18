@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1794937474081,
+      "tag": "0000_secret_goliath",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1794939373792,
+      "tag": "0001_milky_karnak",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1794941867269,
+      "tag": "0002_wooden_katie_power",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1794948498175,
+      "tag": "0003_clammy_ultron",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1794948563351,
+      "tag": "0004_tidy_iron_lad",
+      "breakpoints": true
+    }
+  ]
+}
