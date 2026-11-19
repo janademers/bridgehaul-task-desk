@@ -15,7 +15,7 @@
     "build:cloudflare": "vite build --config vite.cloudflare.config.ts",
     "deploy:cloudflare": "npm run build:cloudflare && wrangler deploy --config dist/server/wrangler.json",
     "db:import": "wrangler d1 execute bridgehaul-task-desk --remote --file migration/import.sql",
-    "test": "node --test tests/access.test.mjs && node tests/recurrence.mjs && node tests/daily-runs.mjs && node tests/assignees.mjs && node tests/duty-policy.mjs"
+    "test": "node --test tests/access.test.mjs && node tests/recurrence.mjs && node tests/daily-runs.mjs && node tests/assignees.mjs && node tests/duty-policy.mjs && node tests/reporting.mjs && node tests/reporting-access.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

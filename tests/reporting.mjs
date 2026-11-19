@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {validateReporting,reportingScope} from '../app/lib/reporting.mjs';
+const staff=[{id:'e',name:'Employee',active:1},{id:'a',name:'Manager A',active:1},{id:'b',name:'Manager B',active:1},{id:'c',name:'Senior Manager',active:1},{id:'x',name:'Inactive',active:0}];
+const lines=[{employee_id:'e',manager_id:'a'},{employee_id:'e',manager_id:'b'},{employee_id:'a',manager_id:'c'}];
+for(const id of ['a','b'])assert.ok(reportingScope(staff.find(s=>s.id===id),staff,lines).editableNames.has('Employee'));
+assert.ok(!reportingScope(staff[3],staff,lines).visibleNames.has('Employee'));
+assert.ok(!reportingScope(staff[0],staff,lines).visibleNames.has('Manager A'));
+assert.deepEqual(validateReporting('e',['a','b','a'],staff,lines),['a','b']);
+assert.throws(()=>validateReporting('e',['e'],staff,lines));assert.throws(()=>validateReporting('e',['x'],staff,lines));assert.throws(()=>validateReporting('a',['e'],staff,lines));assert.throws(()=>validateReporting('c',['e'],staff,lines));
+assert.ok(!reportingScope(staff[1],staff.map(s=>s.id==='e'?{...s,active:0}:s),lines).editableNames.has('Employee'));
+assert.ok(!reportingScope(staff[1],staff,lines.filter(l=>l.manager_id!=='a')).visibleNames.has('Employee'));
+console.log('Multiple managers, direct-only access, no upward access, duplicate removal, self/cycle/inactive rejection, and revoked relationships passed.');
