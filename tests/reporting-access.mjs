@@ -10,7 +10,7 @@ const env={ADMIN_EMAILS:'admin@test.com',DB:{prepare(sql){return {all:async()=>(
 async function call(email,b,path='/api/tasks'){return worker.fetch(new Request('https://taskdesk.test'+path,{method:b?'POST':'GET',headers:{'Cf-Access-Jwt-Assertion':email,'oai-authenticated-user-email':'spoofed@test.com'},...(b?{body:JSON.stringify(b)}:{})}),env,{})}
 for(const manager of ['a','b']){
  const r=await call(manager+'@test.com');const d=await r.json();assert.ok(d.tasks.some(t=>t.id==='e'));assert.ok(!d.tasks.some(t=>t.id==='u'));assert.equal(d.viewer.isManager,true);
- for(const action of ['save','complete','archive','delete','restore'])assert.equal((await call(manager+'@test.com',{action,id:'e',task:{owner:'Employee',title:'Updated'}})).status,200);
+ for(const action of ['save','complete','status','archive','delete','restore'])assert.equal((await call(manager+'@test.com',{action,id:'e',task:{owner:'Employee',title:'Updated'}})).status,200);
  const saved=await (await call(manager+'@test.com',{action:'create',task:{title:'Delegated',owner:'Employee',frequency:'Weekly',workType:'Automated',backup:'Unrelated'}})).json();assert.equal(saved.body.task.owner,'Employee');assert.equal(saved.body.task.workType,'Manual');assert.equal(saved.body.task.backup,'');assert.equal(saved.by,manager+'@test.com');
  assert.equal((await call(manager+'@test.com',{action:'save',id:'e',task:{owner:'Unrelated'}})).status,403);
  assert.equal((await call(manager+'@test.com',{id:'e',reportsTo:['a']},'/api/staff')).status,403);
@@ -20,6 +20,18 @@ const own=await (await call('e@test.com',{action:'create',task:{owner:'Unrelated
 assert.equal((await call('e@test.com',{action:'save',id:'e',task:{title:'Updated'}})).status,200);
 assert.equal((await call('a@test.com',{action:'create',id:'e',task:{frequency:'Weekly'}})).status,400);
 assert.equal((await call('x@test.com')).status,403);
+assert.equal((await call('u@test.com',{action:'status',id:'e',status:'Delayed'})).status,403);
+assert.equal((await call('e@test.com',{action:'status',id:'e',status:'Delayed'})).status,200);
 lines=lines.filter(l=>l.manager_id!=='a');assert.equal((await call('a@test.com',{action:'save',id:'e',task:{}})).status,403);
 assert.equal((await call('admin@test.com',{reportsTo:['a']},'/api/staff')).status,200);
 console.log('Worker access tests passed for both managers, unrelated/upward access denial, employees editing themselves, assignments, create-ID protection, spoofed headers, admin-only reporting, inactive staff, and revoked access.');
+
+people.find(p=>p.id==='u').view_ids=JSON.stringify(['e']);
+let viewed=await (await call('u@test.com')).json();assert.ok(viewed.tasks.some(t=>t.id==='e'&&t.canComplete===false&&t.canManage===false));
+for(const action of ['complete','status','save','assign','archive','delete','restore'])assert.equal((await call('u@test.com',{action,id:'e'})).status,403);
+people.find(p=>p.id==='u').view_ids='[]';tasks.find(t=>t.id==='e').backup='Unrelated';
+viewed=await (await call('u@test.com')).json();assert.ok(viewed.tasks.some(t=>t.id==='e'&&t.canComplete===true&&t.canManage===false));assert.ok(!viewed.tasks.some(t=>t.id==='b'));
+for(const action of ['complete','status'])assert.equal((await call('u@test.com',{action,id:'e'})).status,200);
+for(const action of ['save','assign','archive','delete','restore'])assert.equal((await call('u@test.com',{action,id:'e'})).status,403);
+tasks.find(t=>t.id==='e').backup='';assert.equal((await call('u@test.com',{action:'complete',id:'e'})).status,403);
+console.log('View-only, backup-specific action restrictions, unrelated task isolation, and revoked backup access passed.');
